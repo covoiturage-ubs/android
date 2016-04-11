@@ -102,7 +102,7 @@ namespace covoiturage_univ
             return null;
         }
 
-        public async void SendNotification()
+        public void SendNotification()
         {
             Log.Info("SendNotification","SendNotification");
             EditText notificationText = FindViewById<EditText>(Resource.Id.editText1);
