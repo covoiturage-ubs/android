@@ -102,7 +102,7 @@ namespace covoiturage_univ
             return null;
         }
 
-        public void SendNotification()
+        public async void SendNotification()
         {
             Log.Info("SendNotification","SendNotification");
             EditText notificationText = FindViewById<EditText>(Resource.Id.editText1);
@@ -117,9 +117,8 @@ namespace covoiturage_univ
                 writer.Write(json);
             }
 
-
-           /* HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse;
-                Log.Info("SendNotification", response.StatusCode.ToString());*/
+            HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse;
+                Log.Info("SendNotification", response.StatusCode.ToString());
             
         }
 
