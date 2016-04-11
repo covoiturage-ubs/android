@@ -117,6 +117,7 @@ namespace covoiturage_univ
                 writer.Write(json);
             }
 
+
            /* HttpWebResponse response = await request.GetResponseAsync() as HttpWebResponse;
                 Log.Info("SendNotification", response.StatusCode.ToString());*/
             
