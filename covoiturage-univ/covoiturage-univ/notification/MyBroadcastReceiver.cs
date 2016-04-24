@@ -38,31 +38,48 @@ namespace covoiturage_univ.notification
     {
         public static string RegistrationID { get; private set; }
         public static NotificationHub Hub { get; set; }
+        public static bool running = false;
 
         public PushHandlerService() : base(Constants.SenderID)
         {
+            running = true;
             Log.Info(MyBroadcastReceiver.TAG, "PushHandlerService() constructor");
         }
 
         void createNotification(string title, string desc)
         {
             //Create notification
-            var notificationManager = GetSystemService(Context.NotificationService) as NotificationManager;
-
-            //Create an intent to show UI
-            var uiIntent = new Intent(this, typeof(MainActivity));
+            NotificationManager notificationManager = GetSystemService(Context.NotificationService) as NotificationManager;
 
             //Create the notification
-            var notification = new Notification(Android.Resource.Drawable.SymActionEmail, title);
+            Notification notification;
+            //notification = new Notification(Android.Resource.Drawable.SymActionEmail, title);
 
             //Auto-cancel will remove the notification once the user touches it
-            notification.Flags = NotificationFlags.AutoCancel;
+            //notification.Flags = NotificationFlags.AutoCancel;
 
             //Set the notification info
             //we use the pending intent, passing our ui intent over, which will get called
             //when the notification is tapped.
-            notification.SetLatestEventInfo(this, title, desc, PendingIntent.GetActivity(this, 0, uiIntent, 0));
-            //notification = new Notification.Builder(this).SetContentTitle(title).SetContentText(desc).SetWhen(DateTime.Now.Ticks).SetContentIntent(PendingIntent.GetActivity(this, 0, uiIntent, 0)).Build();
+
+            Intent instance = null;
+
+            if (MainActivity.instance == null)
+            {
+                new Intent(this, typeof(MainActivity));
+            }
+            else
+            {
+                instance = MainActivity.instance.Intent;
+            }
+
+            notification = new Notification.Builder(this)
+                .SetSmallIcon(Android.Resource.Drawable.SymActionEmail)
+                .SetContentIntent(PendingIntent.GetActivity(this, 0, instance, 0))
+                .SetContentTitle(title)
+                .SetContentText(desc)
+                .SetAutoCancel(true)
+                .Notification;
 
             //Show the notification
             notificationManager.Notify(1, notification);
@@ -77,6 +94,9 @@ namespace covoiturage_univ.notification
                 AlertDialog alert = dlg.Create();
                 alert.SetTitle(title);
                 alert.SetButton("Ok", delegate {
+                    
+                });
+                alert.SetButton2("Annuler", delegate {
                     alert.Dismiss();
                 });
                 alert.SetMessage(message);
@@ -115,19 +135,10 @@ namespace covoiturage_univ.notification
             createNotification("PushHandlerService-GCM Registered...",
                                 "The device has been Registered!");
 
-            Hub = new NotificationHub(Constants.NotificationHubName, Constants.ListenConnectionString,
-                                        context);
-            try
-            {
-                Hub.UnregisterAll(registrationId);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(MyBroadcastReceiver.TAG, ex.Message);
-            }
-
+            Hub = new NotificationHub(Constants.NotificationHubName, Constants.ListenConnectionString, context);
+            
             //var tags = new List<string>() { "falcons" }; // create tags if you want
-            var tags = new List<string>() { };
+            var tags = new List<string>() { "test" };
 
             try
             {
